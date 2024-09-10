@@ -18,15 +18,34 @@ def process_file():
             return "Invalid file format. Please upload a CSV or XLSX file."
 
         # Read the file into a DataFrame
-        if file_ext == ".csv":
-            df = pd.read_csv(uploaded_file)
-        else:
-            df = pd.read_excel(uploaded_file)
+        try:
+            if file_ext == ".csv":
+                df = pd.read_csv(uploaded_file, encoding='utf-8')
+            else:
+                df = pd.read_excel(uploaded_file, engine='openpyxl')
+
+        except UnicodeDecodeError:
+            # Try different encodings if UTF-8 fails
+            try:
+                uploaded_file.seek(0)  # Reset file pointer to start
+                df = pd.read_csv(uploaded_file, encoding='latin1')
+            except UnicodeDecodeError:
+                try:
+                    uploaded_file.seek(0)  # Reset file pointer to start
+                    df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
+                except UnicodeDecodeError:
+                    return "Unable to read the file due to encoding issues."
+
+        except Exception as e:
+            return f"An error occurred while reading the file: {str(e)}"
 
         # Generate the profile report
-        profile = ProfileReport(df, minimal=False)  # Change minimal to False
-        profile_file = "static/profile_report.html"
-        profile.to_file(profile_file)
+        try:
+            profile = ProfileReport(df, minimal=False)
+            profile_file = "static/profile_report.html"
+            profile.to_file(profile_file)
+        except Exception as e:
+            return f"An error occurred while generating the profile report: {str(e)}"
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
