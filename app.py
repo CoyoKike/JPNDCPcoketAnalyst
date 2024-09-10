@@ -36,7 +36,7 @@ def process_file():
                     return "Unable to read the file due to encoding issues."
 
         # Generate the profile report
-        profile = ProfileReport(df, minimal=True)
+        profile = ProfileReport(df, minimal=False)
         profile_file = "static/profile_report.html"
         profile.to_file(profile_file)
 
