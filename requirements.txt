@@ -1,10 +1,9 @@
 Flask
 pandas
-pandas-profiling
+pandas-profiling>=3.2.0
 openpyxl
 Werkzeug
 gunicorn
 numpy
 scikit-learn
-pydantic
 pydantic-settings
