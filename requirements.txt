@@ -1,7 +1,7 @@
-Flask==2.3.0
-pandas==2.1.1
-ydata-profiling==4.0.0
-numpy==1.24.4
+Flask
+pandas
+ydata-profiling
+numpy
 openpyxl
 Werkzeug
 gunicorn
