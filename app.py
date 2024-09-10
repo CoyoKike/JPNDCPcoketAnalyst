@@ -2,6 +2,7 @@ from flask import Flask, request, render_template
 from pandas_profiling import ProfileReport
 import pandas as pd
 import os
+import chardet
 
 app = Flask(__name__)
 
@@ -19,23 +20,18 @@ def process_file():
 
         # Read the file into a DataFrame
         try:
+            uploaded_file.seek(0)  # Reset file pointer to start
             if file_ext == ".csv":
-                df = pd.read_csv(uploaded_file, encoding='utf-8')
+                # Detect file encoding
+                result = chardet.detect(uploaded_file.read())
+                encoding = result['encoding']
+                uploaded_file.seek(0)  # Reset file pointer again
+                df = pd.read_csv(uploaded_file, encoding=encoding)
             else:
                 df = pd.read_excel(uploaded_file, engine='openpyxl')
 
-        except UnicodeDecodeError:
-            # Try different encodings if UTF-8 fails
-            try:
-                uploaded_file.seek(0)  # Reset file pointer to start
-                df = pd.read_csv(uploaded_file, encoding='latin1')
-            except UnicodeDecodeError:
-                try:
-                    uploaded_file.seek(0)  # Reset file pointer to start
-                    df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
-                except UnicodeDecodeError:
-                    return "Unable to read the file due to encoding issues."
-
+        except UnicodeDecodeError as e:
+            return f"Encoding error: {str(e)}"
         except Exception as e:
             return f"An error occurred while reading the file: {str(e)}"
 
