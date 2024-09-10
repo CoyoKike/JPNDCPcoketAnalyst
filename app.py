@@ -22,7 +22,7 @@ def process_file():
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8')
             else:
-                df = pd.read_excel(uploaded_file)
+                df = pd.read_excel(uploaded_file, engine='openpyxl')
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
@@ -36,11 +36,6 @@ def process_file():
                     return "Unable to read the file due to encoding issues."
         except Exception as e:
             return f"An error occurred while reading the file: {str(e)}"
-
-        # Preprocess DataFrame if necessary
-        # Example: Combining split columns if needed
-        # df['Address'] = df['Address_Part1'].astype(str) + ' ' + df['Address_Part2'].astype(str)
-        # df = df.drop(['Address_Part1', 'Address_Part2'], axis=1)
 
         # Generate the profile report
         try:
@@ -56,3 +51,4 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
+
