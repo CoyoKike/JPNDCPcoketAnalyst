@@ -22,7 +22,7 @@ def process_file():
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8')
             else:
-                df = pd.read_excel(uploaded_file, engine='openpyxl')
+                df = pd.read_excel(uploaded_file)
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
@@ -34,16 +34,11 @@ def process_file():
                     df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
-        except Exception as e:
-            return f"An error occurred while reading the file: {str(e)}"
 
         # Generate the profile report
-        try:
-            profile = ProfileReport(df, minimal=False, explorative=True, correlations={"pearson": True})
-            profile_file = "static/profile_report.html"
-            profile.to_file(profile_file)
-        except Exception as e:
-            return f"An error occurred while generating the profile report: {str(e)}"
+        profile = ProfileReport(df, minimal=False)
+        profile_file = "static/profile_report.html"
+        profile.to_file(profile_file)
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
