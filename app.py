@@ -34,11 +34,21 @@ def process_file():
                     df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
+        except Exception as e:
+            return f"An error occurred while reading the file: {str(e)}"
+
+        # Preprocess DataFrame if necessary
+        # Example: Combining split columns if needed
+        # df['Address'] = df['Address_Part1'].astype(str) + ' ' + df['Address_Part2'].astype(str)
+        # df = df.drop(['Address_Part1', 'Address_Part2'], axis=1)
 
         # Generate the profile report
-        profile = ProfileReport(df, minimal=False)
-        profile_file = "static/profile_report.html"
-        profile.to_file(profile_file)
+        try:
+            profile = ProfileReport(df, minimal=False, explorative=True, correlations={"pearson": True})
+            profile_file = "static/profile_report.html"
+            profile.to_file(profile_file)
+        except Exception as e:
+            return f"An error occurred while generating the profile report: {str(e)}"
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
@@ -46,4 +56,3 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
-
