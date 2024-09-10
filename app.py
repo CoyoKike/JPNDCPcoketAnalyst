@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template
 from pandas_profiling import ProfileReport
+from pydantic_settings import BaseSettings
 import pandas as pd
 import os
 
