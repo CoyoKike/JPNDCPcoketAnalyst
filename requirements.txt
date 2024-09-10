@@ -6,3 +6,4 @@ Werkzeug
 gunicorn
 numpy
 scikit-learn
+pydantic-settings
