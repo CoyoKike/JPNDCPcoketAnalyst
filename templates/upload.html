@@ -1,0 +1,23 @@
+<!doctype html>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Pocket Analyst</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/jpndc_logo.png') }}" alt="Logo" width="600" height="200">
+        <h1>Pocket Analyst</h1>
+        <h3>Upload a CSV or XLSX File</h3>
+        <form action="/process" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv, .xlsx">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+
+</html>

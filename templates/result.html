@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <img src="{{ url_for('static', filename='images/jpndc_logo.png') }}" alt="Logo" width="600" height="200">
+
+    <title>Profile Report</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Profile Report Generated!</h1>
+        <p>Click <a href="{{ profile_url }}">here</a> to view the report.</p>
+    </div>
+</body>
+
+</html>
