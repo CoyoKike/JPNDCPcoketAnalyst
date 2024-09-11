@@ -8,4 +8,4 @@ gunicorn
 scikit-learn
 pydantic
 pydantic-settings
-openpyxl
+
