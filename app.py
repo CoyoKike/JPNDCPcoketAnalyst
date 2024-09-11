@@ -44,6 +44,11 @@ def process_file():
         # Debug: Print updated column names
         print("Updated column names:", df.columns.tolist())
 
+        # Convert only non-numeric columns to string to avoid splitting issues
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                df[col] = df[col].astype(str)
+
         # Generate the profile report
         try:
             profile = ProfileReport(df, minimal=False, infer_dtypes=False)
@@ -58,3 +63,4 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
+
