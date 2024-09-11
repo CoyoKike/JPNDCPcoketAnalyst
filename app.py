@@ -14,37 +14,30 @@ def process_file():
     uploaded_file = request.files["file"]
     if uploaded_file.filename != "":
         file_ext = os.path.splitext(uploaded_file.filename)[1]
-        if file_ext not in [".csv", ".xlsx", ".xls"]:
-            return "Invalid file format. Please upload a CSV, XLSX, or XLS file."
+        if file_ext not in [".csv", ".xlsx"]:
+            return "Invalid file format. Please upload a CSV or XLSX file."
 
         # Read the file into a DataFrame
         try:
             if file_ext == ".csv":
-                df = pd.read_csv(uploaded_file, encoding='utf-8', quotechar='"')
-            elif file_ext == ".xlsx":
-                df = pd.read_excel(uploaded_file, engine='openpyxl')
-            else:  # For .xls files
-                df = pd.read_excel(uploaded_file, engine='xlrd')
+                df = pd.read_csv(uploaded_file, encoding='utf-8')
+            else:
+                df = pd.read_excel(uploaded_file)
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
                 uploaded_file.seek(0)  # Reset file pointer to start
-                df = pd.read_csv(uploaded_file, encoding='latin1', quotechar='"')
+                df = pd.read_csv(uploaded_file, encoding='latin1')
             except UnicodeDecodeError:
                 try:
                     uploaded_file.seek(0)  # Reset file pointer to start
-                    df = pd.read_csv(uploaded_file, encoding='iso-8859-1', quotechar='"')
+                    df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
-        except Exception as e:
-            return f"An error occurred while processing the file: {str(e)}"
 
-        # Convert currency columns to numeric (if needed)
-        for col in df.columns:
-            if df[col].dtype == 'object':
-                # Remove common currency symbols and commas, then convert to numeric
-                df[col] = df[col].replace({'\$': '', ',': ''}, regex=True)
-                df[col] = pd.to_numeric(df[col], errors='ignore')
+        # Ensure that columns with spaces are treated as a whole
+        for col in df.select_dtypes(include=['object']).columns:
+            df[col] = df[col].astype('category')
 
         # Generate the profile report
         profile = ProfileReport(df, minimal=False)
