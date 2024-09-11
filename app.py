@@ -21,43 +21,24 @@ def process_file():
         try:
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8')
-                
-                # Replace spaces with underscores in column names
-                df.columns = df.columns.str.replace(' ', '_')
-                
             else:
-                df = pd.read_excel(uploaded_file)  # Let pandas choose the engine
-                
-                # Replace spaces with underscores in column names
-                df.columns = df.columns.str.replace(' ', '_')
-                
+                df = pd.read_excel(uploaded_file)
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
                 uploaded_file.seek(0)  # Reset file pointer to start
                 df = pd.read_csv(uploaded_file, encoding='latin1')
-                
-                # Replace spaces with underscores in column names
-                df.columns = df.columns.str.replace(' ', '_')
-                
             except UnicodeDecodeError:
                 try:
                     uploaded_file.seek(0)  # Reset file pointer to start
                     df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
-                    
-                    # Replace spaces with underscores in column names
-                    df.columns = df.columns.str.replace(' ', '_')
-                    
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
-        
+
         # Generate the profile report
-        try:
-            profile = ProfileReport(df, minimal=False)
-            profile_file = "static/profile_report.html"
-            profile.to_file(profile_file)
-        except Exception as e:
-            return f"Error generating profile report: {e}"
+        profile = ProfileReport(df, minimal=False, infer_dtypes=False)
+        profile_file = "static/profile_report.html"
+        profile.to_file(profile_file)
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
@@ -65,3 +46,5 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
+
+
