@@ -44,10 +44,10 @@ def process_file():
         # Debug: Print updated column names
         print("Updated column names:", df.columns.tolist())
 
-        # Convert only non-numeric columns to string to avoid splitting issues
+        # Convert object columns to categorical data types
         for col in df.columns:
             if df[col].dtype == 'object':
-                df[col] = df[col].astype(str)
+                df[col] = df[col].astype('category')
 
         # Generate the profile report
         try:
