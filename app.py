@@ -41,13 +41,15 @@ def process_file():
         # Replace spaces with underscores in column names
         df.columns = df.columns.str.replace(' ', '_', regex=False)
 
-        # Debug: Print updated column names
-        print("Updated column names:", df.columns.tolist())
-
-        # Convert object columns to categorical data types
+        # Convert currency columns to numeric by removing symbols and commas
         for col in df.columns:
             if df[col].dtype == 'object':
-                df[col] = df[col].astype('category')
+                df[col] = df[col].str.replace('[\$,]', '', regex=True).astype(float)  # Removes $ and commas, converts to float
+            else:
+                df[col] = df[col].astype(str)  # Convert other non-numeric columns to string
+
+        # Debug: Print updated column names
+        print("Updated column names:", df.columns.tolist())
 
         # Generate the profile report
         try:
@@ -63,3 +65,4 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
+
