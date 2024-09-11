@@ -35,9 +35,9 @@ def process_file():
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
 
-        # Ensure that columns with spaces are treated as a whole
+        # Replace spaces with underscores in categorical columns
         for col in df.select_dtypes(include=['object']).columns:
-            df[col] = df[col].astype('category')
+            df[col] = df[col].str.replace(' ', '_')
 
         # Generate the profile report
         profile = ProfileReport(df, minimal=False)
