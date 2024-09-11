@@ -35,10 +35,16 @@ def process_file():
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
 
+        # Replace spaces with underscores in column names
+        df.columns = df.columns.str.replace(' ', '_')
+
         # Generate the profile report
-        profile = ProfileReport(df, minimal=False, infer_dtypes=False)
-        profile_file = "static/profile_report.html"
-        profile.to_file(profile_file)
+        try:
+            profile = ProfileReport(df, minimal=False, infer_dtypes=False)
+            profile_file = "static/profile_report.html"
+            profile.to_file(profile_file)
+        except Exception as e:
+            return f"Error generating profile report: {e}"
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
@@ -46,5 +52,3 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
-
-
