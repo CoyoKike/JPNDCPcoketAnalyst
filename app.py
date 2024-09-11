@@ -14,15 +14,17 @@ def process_file():
     uploaded_file = request.files["file"]
     if uploaded_file.filename != "":
         file_ext = os.path.splitext(uploaded_file.filename)[1]
-        if file_ext not in [".csv", ".xlsx"]:
-            return "Invalid file format. Please upload a CSV or XLSX file."
+        if file_ext not in [".csv", ".xlsx", ".xls"]:
+            return "Invalid file format. Please upload a CSV, XLSX, or XLS file."
 
         # Read the file into a DataFrame
         try:
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8', quotechar='"')
-            else:
-                df = pd.read_excel(uploaded_file)
+            elif file_ext == ".xlsx":
+                df = pd.read_excel(uploaded_file, engine='openpyxl')
+            else:  # For .xls files
+                df = pd.read_excel(uploaded_file, engine='xlrd')
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
@@ -34,6 +36,8 @@ def process_file():
                     df = pd.read_csv(uploaded_file, encoding='iso-8859-1', quotechar='"')
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
+        except Exception as e:
+            return f"An error occurred while processing the file: {str(e)}"
 
         # Convert currency columns to numeric (if needed)
         for col in df.columns:
@@ -53,5 +57,3 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
-
-
