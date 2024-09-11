@@ -21,12 +21,16 @@ def process_file():
         try:
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8')
+                
+                # Replace spaces with underscores in column names
+                df.columns = df.columns.str.replace(' ', '_')
+                
             else:
-                df = pd.read_excel(uploaded_file)
-            
-            # Replace spaces with underscores in column names
-            df.columns = df.columns.str.replace(' ', '_')
-            
+                df = pd.read_excel(uploaded_file)  # Let pandas choose the engine
+                
+                # Replace spaces with underscores in column names
+                df.columns = df.columns.str.replace(' ', '_')
+                
         except UnicodeDecodeError:
             # Try different encodings if UTF-8 fails
             try:
