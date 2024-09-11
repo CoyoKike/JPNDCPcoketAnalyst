@@ -35,8 +35,14 @@ def process_file():
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
 
+        # Debug: Print original column names
+        print("Original column names:", df.columns.tolist())
+
         # Replace spaces with underscores in column names
-        df.columns = df.columns.str.replace(' ', '_')
+        df.columns = df.columns.str.replace(' ', '_', regex=False)
+
+        # Debug: Print updated column names
+        print("Updated column names:", df.columns.tolist())
 
         # Generate the profile report
         try:
