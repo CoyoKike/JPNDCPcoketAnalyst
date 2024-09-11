@@ -2,8 +2,6 @@ from flask import Flask, request, render_template
 from pandas_profiling import ProfileReport
 import pandas as pd
 import os
-from openpyxl import load_workbook
-import openpyxl
 
 app = Flask(__name__)
 
@@ -19,34 +17,43 @@ def process_file():
         if file_ext not in [".csv", ".xlsx"]:
             return "Invalid file format. Please upload a CSV or XLSX file."
 
+        # Read the file into a DataFrame
         try:
             if file_ext == ".csv":
                 df = pd.read_csv(uploaded_file, encoding='utf-8')
             else:
                 df = pd.read_excel(uploaded_file)
+            
+            # Replace spaces with underscores in column names
+            df.columns = df.columns.str.replace(' ', '_')
+            
         except UnicodeDecodeError:
+            # Try different encodings if UTF-8 fails
             try:
-                uploaded_file.seek(0)
+                uploaded_file.seek(0)  # Reset file pointer to start
                 df = pd.read_csv(uploaded_file, encoding='latin1')
+                
+                # Replace spaces with underscores in column names
+                df.columns = df.columns.str.replace(' ', '_')
+                
             except UnicodeDecodeError:
                 try:
-                    uploaded_file.seek(0)
+                    uploaded_file.seek(0)  # Reset file pointer to start
                     df = pd.read_csv(uploaded_file, encoding='iso-8859-1')
+                    
+                    # Replace spaces with underscores in column names
+                    df.columns = df.columns.str.replace(' ', '_')
+                    
                 except UnicodeDecodeError:
                     return "Unable to read the file due to encoding issues."
-        except TypeError as e:
-            return f"Error processing Excel file: {e}"
-        except openpyxl.utils.exceptions.InvalidFileException:
-            return "The Excel file format is not supported."
-
-        # Replace spaces with underscores in categorical columns
-        for col in df.select_dtypes(include=['object']).columns:
-            df[col] = df[col].str.replace(' ', '_')
-
+        
         # Generate the profile report
-        profile = ProfileReport(df, minimal=False)
-        profile_file = "static/profile_report.html"
-        profile.to_file(profile_file)
+        try:
+            profile = ProfileReport(df, minimal=False)
+            profile_file = "static/profile_report.html"
+            profile.to_file(profile_file)
+        except Exception as e:
+            return f"Error generating profile report: {e}"
 
         return render_template("result.html", profile_url=f"/{profile_file}")
     else:
@@ -54,4 +61,3 @@ def process_file():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
-
